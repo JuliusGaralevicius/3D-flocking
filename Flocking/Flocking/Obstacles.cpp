@@ -1,31 +1,24 @@
 #include "Obstacles.h"
 #include "Shader.h"
-#include <cmath>
 #include <time.h>
 
-
-float radians(float degrees)
-{
-	return degrees * 3.141592653589793 / 180.0;
-}
 Obstacles::Obstacles()
 {
-	Shader *rShader = new Shader("ObstacleVertex.glsl", "ObstacleFragment.glsl", "");
+	Shader *rShader = new Shader("ObstacleVertex.glsl", "ObstacleFragment.glsl");
 	renderProgram = rShader->getID();
-	Shader *cShader = new Shader("ObstacleCompute2.glsl");
+	Shader *cShader = new Shader("ObstacleCompute.glsl");
 	computeProgram = cShader->getID();
 
 	mvpLoc = glGetUniformLocation(renderProgram, "mvp");
 	mLoc = glGetUniformLocation(renderProgram, "m");
 	vpLoc = glGetUniformLocation(renderProgram, "vp");
 
-	t = glGetUniformLocation(computeProgram, "time");
 	deltaT = glGetUniformLocation(computeProgram, "dt");
 
-	obstacle_data_t* obstacleData = new obstacle_data_t[OBSTACLESCOUNT];
+	obstacle_data_t* obstacleData = new obstacle_data_t[OBSTACLE_COUNT];
 	// initiate obstacles
 	srand(time(0));
-	for (int i = 0; i < OBSTACLESCOUNT; i++)
+	for (int i = 0; i < OBSTACLE_COUNT; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
@@ -33,23 +26,12 @@ Obstacles::Obstacles()
 			obstacleData[i].velocity[j] = ((static_cast<float>(rand()) / static_cast <float> (RAND_MAX)) -0.5)*0.5;
 		}
 
-		obstacleData[i].radius = (static_cast<float>(rand()) / static_cast <float> (RAND_MAX)) * 40+20;
+		obstacleData[i].radius = (static_cast<float>(rand()) / static_cast <float> (RAND_MAX)) * (RADIUS_LIMITS[1] - RADIUS_LIMITS[0]) + RADIUS_LIMITS[0];
 	}
 
 	glGenBuffers(1, &obstacleSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, obstacleSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(obstacle_data_t)*OBSTACLESCOUNT, obstacleData, GL_DYNAMIC_COPY);
-
-	//Vector3 start(0.0, 0.0, 0.0);
-	//geometry.push_back(start);
-	//float angleStep = 360.0f / NUMSIDES;
-	//float angle = 0;
-	//while (angle <= 360.0f)
-	//{
-	//	Vector3 pos(cosf(radians(angle)), sinf(radians(angle)), 0.0f);
-	//	geometry.push_back(pos);
-	//	angle += angleStep;
-	//}
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(obstacle_data_t)*OBSTACLE_COUNT, obstacleData, GL_DYNAMIC_COPY);
 	
 	GLuint posBuff;
 	glGenBuffers(1, &posBuff);
@@ -84,7 +66,6 @@ Obstacles::Obstacles()
 void Obstacles::Render(double dt, Matrix4 vp, float time)
 {
 	glUseProgram(computeProgram);
-	glUniform1f(t, time);
 	glUniform1f(deltaT, dt);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, obstacleSSBO);
 	glDispatchCompute(1, 1, 1);
@@ -99,7 +80,7 @@ void Obstacles::Render(double dt, Matrix4 vp, float time)
 	glUniformMatrix4fv(vpLoc, 1, GL_FALSE, vp.values);
 	glUniformMatrix4fv(mLoc, 1, GL_FALSE, model.values);
 
-	glDrawArraysInstanced(GL_TRIANGLES, 0, positions.size(), OBSTACLESCOUNT);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, positions.size(), OBSTACLE_COUNT);
 	glBindVertexArray(0);
 }
 

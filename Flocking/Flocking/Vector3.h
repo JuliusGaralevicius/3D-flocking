@@ -3,12 +3,6 @@ Class:Vector3
 Implements:
 Author:Rich Davison
 Description:VERY simple Vector3 class.
-
--_-_-_-_-_-_-_,------,
-_-_-_-_-_-_-_-|   /\_/\   NYANYANYAN
--_-_-_-_-_-_-~|__( ^ .^) /
-_-_-_-_-_-_-_-""  ""
-
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <cmath>

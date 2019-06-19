@@ -136,7 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Boid.cpp" />
+    <ClCompile Include="Boids.cpp" />
     <ClCompile Include="DebugShape.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix4.cpp" />
@@ -144,7 +144,7 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Boid.h" />
+    <ClInclude Include="Boids.h" />
     <ClInclude Include="DebugShape.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="Obstacles.h" />
